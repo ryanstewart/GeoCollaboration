@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   minWidth="1024" minHeight="768" 
+			   xmlns:authentication="com.adobe.rtc.authentication.*" 
+			   xmlns:session="com.adobe.rtc.session.*"
+			   creationComplete="application1_creationCompleteHandler(event)" 
+			   xmlns:maps="com.google.maps.*" 
+			   xmlns:afcsmax="com.digitalbackcountry.afcsmax.*">
+	<fx:Script source="AccountInfo.as" />
+	<fx:Script>
+		<![CDATA[
+			import afcs.collections.SharedArrayCollection;
+			
+			import com.adobe.gpslib.gpx.Waypoint;
+			import com.adobe.rtc.events.AuthenticationEvent;
+			import com.adobe.rtc.events.SessionEvent;
+			import com.adobe.rtc.sharedModel.CollectionNode;
+			import com.digitalbackcountry.afcsgeo.AFCSMap;
+			import com.google.maps.LatLng;
+			import com.google.maps.MapType;
+			import com.google.maps.controls.ZoomControl;
+			
+			import mx.events.FlexEvent;
+
+			public var collNode:CollectionNode;
+			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				cSession.login();
+			}
+
+
+			protected function btn_clickHandler(event:MouseEvent):void
+			{
+				//var wpt:Waypoint = new Waypoint(122.2343,54.2342);
+				//var item:WaypointItem = new WaypointItem("waypoints",wpt);
+				
+				//collNode.publishItem(item);
+			}
+
+
+			protected function auth_authenticationSuccessHandler(event:AuthenticationEvent):void
+			{
+				collNode = new CollectionNode();
+				collNode.sharedID = "testNode";
+				collNode.subscribe();
+			}
+
+
+			protected function cSession_synchronizationChangeHandler(event:SessionEvent):void
+			{
+				if(!map)
+				{
+					
+					
+					var map:AFCSMap = new AFCSMap();
+					map.key = "ABQIAAAAEPSnxMQDa8BRcDfJB7EW1hT0DGldlhguU2Qv3EmCIW3pKOfVZRQe3iZhrAWXZqFTzxe4nlZvAfz_Fw";
+					map.width = 500;
+					map.height = 500;
+					map.addControl(new ZoomControl());
+					uiHolder.addChild(map);	
+				}
+				
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<authentication:AdobeHSAuthenticator id="auth" userName="{username}"
+											 password="{password}" authenticationSuccess="auth_authenticationSuccessHandler(event)" />
+		<session:ConnectSession id="cSession" authenticator="{auth}" synchronizationChange="cSession_synchronizationChangeHandler(event)"
+								roomURL="https://connectnow.acrobat.com/cocoryan/digitalwalkabout" />
+	</fx:Declarations>
+	<s:layout>
+		<s:HorizontalLayout />
+	</s:layout>
+	<s:Button label="Add Waypoint" id="btn" click="btn_clickHandler(event)" />
+	<s:ToggleButton label="Baton" id="tbBaton" width="150" height="45" />
+	<mx:UIComponent id="uiHolder" width="500" height="500" y="25" />
+</s:Application>
